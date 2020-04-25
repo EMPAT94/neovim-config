@@ -28,8 +28,8 @@ set expandtab tabstop=2 shiftwidth=2
 set autoindent smartindent
 set hidden
 set nobackup noswapfile
-
-
+set spelllang=en
+" set spell " To check spellings
 
 
 """"""""""""""""""""""""""""""
@@ -61,6 +61,9 @@ noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
 
+" Quick bracket
+inoremap {<CR> {<CR>}<Esc>O
+
 " Clear highlights TODO: Change to something with leader
 noremap <localleader><CR> :nohls<CR>
 
@@ -84,3 +87,5 @@ let g:fzf_buffers_jump = 1
 " Goyo
 let g:goyo_width = 120
 let g:goyo_height = 100
+
+
