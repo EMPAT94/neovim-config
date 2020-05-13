@@ -12,6 +12,8 @@ Plug 'sheerun/vim-polyglot'
 Plug 'junegunn/goyo.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'neovimhaskell/haskell-vim'
+Plug 'tpope/vim-repeat'
+Plug 'terryma/vim-multiple-cursors'
 call plug#end()
 
 
@@ -27,14 +29,14 @@ set splitright splitbelow
 set relativenumber
 set ignorecase smartcase
 set expandtab tabstop=2 shiftwidth=2
-set autoindent smartindent
+set smartindent
 set hidden
 set nobackup noswapfile nowritebackup
-set spelllang=en
 set updatetime=300
 set shortmess+=c
 set signcolumn=yes
 set clipboard=unnamed
+set spelllang=en
 " set spell " To check spellings
 
 " Use tab for trigger completion with characters ahead and navigate.
@@ -86,6 +88,9 @@ inoremap {<CR> {<CR>}<Esc>O
 " Quick close buffer
 noremap <leader>d :bd<CR>
 
+" Magic search
+noremap / /\v
+
 " Clear highlights TODO: Change to something with leader
 noremap <localleader><CR> :nohls<CR>
 
@@ -97,6 +102,9 @@ noremap <silent> <leader><CR> :Goyo<CR>
 
 " Commentary
 " TODO
+"
+" PRETTIER
+vnoremap <leader>f  <Plug>(coc-format-selected)
 
 " COC
 inoremap <silent><expr> <c-space> coc#refresh()
