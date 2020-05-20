@@ -17,11 +17,52 @@ Plug 'terryma/vim-multiple-cursors'
 call plug#end()
 
 
-
-
 """"""""""""""""""""""""""""""
 """"""""""" DEFAULTS """""""""
 """"""""""""""""""""""""""""""
+
+" Neovim defaults
+" Syntax highlighting is enabled by default
+" ":filetype plugin indent on" is enabled by default
+" 'autoindent' is enabled
+" 'autoread' is enabled
+" 'background' defaults to "dark" (unless set automatically by the terminal/UI)
+" 'backspace' defaults to "indent,eol,start"
+" 'backupdir' defaults to .,~/.local/share/nvim/backup (|xdg|)
+" 'belloff' defaults to "all"
+" 'compatible' is always disabled
+" 'complete' excludes "i"
+" 'cscopeverbose' is enabled
+" 'directory' defaults to ~/.local/share/nvim/swap// (|xdg|), auto-created
+" 'display' defaults to "lastline,msgsep"
+" 'encoding' is UTF-8 (cf. 'fileencoding' for file-content encoding)
+" 'fillchars' defaults (in effect) to "vert:│,fold:·"
+" 'formatoptions' defaults to "tcqj"
+" 'fsync' is disabled
+" 'history' defaults to 10000 (the maximum)
+" 'hlsearch' is enabled
+" 'incsearch' is enabled
+" 'langnoremap' is enabled
+" 'langremap' is disabled
+" 'laststatus' defaults to 2 (statusline is always shown)
+" 'listchars' defaults to "tab:> ,trail:-,nbsp:+"
+" 'nrformats' defaults to "bin,hex"
+" 'ruler' is enabled
+" 'sessionoptions' excludes "options"
+" 'shortmess' includes "F", excludes "S"
+" 'showcmd' is enabled
+" 'sidescroll' defaults to 1
+" 'smarttab' is enabled
+" 'tabpagemax' defaults to 50
+" 'tags' defaults to "./tags;,tags"
+" 'ttimeoutlen' defaults to 50
+" 'ttyfast' is always set
+" 'undodir' defaults to ~/.local/share/nvim/undo (|xdg|), auto-created
+" 'viminfo' includes "!"
+" 'wildmenu' is enabled
+" 'wildoptions' defaults to "pum,tagfile"
+" The |man.vim| plugin is enabled, to provide the |:Man| command.
+" The |matchit| plugin is enabled.
 
 colorscheme dracula
 set mouse=a
@@ -53,6 +94,7 @@ function! s:check_back_space() abort
   return !col
 endfunction
 
+
 """"""""""""""""""""""""""""""
 """"""""""" MAPPINGS """""""""
 """"""""""""""""""""""""""""""
@@ -60,12 +102,13 @@ endfunction
 let mapleader = ","
 let maplocalleader = " "
 
-" remap j and k to scroll by visual lines
+" Remap j and k to scroll by visual lines
 nnoremap j gj
 nnoremap k gk
 
 " Colon switch
 nnoremap ; :
+vnoremap ; :
 
 " Quick config change and reloads
 noremap <leader>e :vsp ~/.config/nvim/init.vim<CR>
@@ -87,6 +130,13 @@ inoremap {<CR> {<CR>}<Esc>O
 
 " Quick close buffer
 noremap <leader>d :bd<CR>
+
+" Quick blank lines
+noremap <leader>j o<ESC>k
+noremap <leader>k O<ESC>j
+
+" Quick format whole buffer
+noremap <leader>f :Format<CR>
 
 " Magic search
 noremap / /\v
@@ -170,8 +220,9 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
+
 """"""""""""""""""""""""""""""
-""""""""""" GLOBALS """""""""
+"""""""""""" GLOBALS """""""""
 """"""""""""""""""""""""""""""
 
 " FZF [Buffers] Jump to the existing window if possible
@@ -181,4 +232,3 @@ let g:fzf_buffers_jump = 1
 let g:goyo_width = 120
 let g:goyo_height = 100
 
-" COC
