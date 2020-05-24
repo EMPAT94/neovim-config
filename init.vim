@@ -135,14 +135,14 @@ noremap <leader>d :bd<CR>
 noremap <leader>j o<ESC>k
 noremap <leader>k O<ESC>j
 
-" Quick format whole buffer
-noremap <leader>f :Format<CR>
+" Quick netrw window
+noremap <silent> <leader>z :Lex<CR>
 
 " Magic search
 noremap / /\v
 
 " Clear highlights TODO: Change to something with leader
-noremap <localleader><CR> :nohls<CR>
+noremap <silent> <localleader><CR> :nohls<CR>
 
 " FZF
 noremap <C-p> :Files<CR>
@@ -157,7 +157,7 @@ noremap <silent> <leader><CR> :Goyo<CR>
 vnoremap <leader>f  <Plug>(coc-format-selected)
 
 " COC
-inoremap <silent><expr> <c-space> coc#refresh()
+inoremap <silent><expr> <C-space> coc#refresh()
 
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
 " position. Coc only does snippet and additional edit on confirm.
@@ -224,6 +224,11 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 """"""""""""""""""""""""""""""
 """""""""""" GLOBALS """""""""
 """"""""""""""""""""""""""""""
+
+" NETRW
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_winsize = 30
 
 " FZF [Buffers] Jump to the existing window if possible
 let g:fzf_buffers_jump = 1

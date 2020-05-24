@@ -1,4 +1,4 @@
-```Vim script
+```vim
 """"""""""""""""""""""""""""""
 """"""""""" PLUGINS """"""""""
 """"""""""""""""""""""""""""""
@@ -136,14 +136,14 @@ noremap <leader>d :bd<CR>
 noremap <leader>j o<ESC>k
 noremap <leader>k O<ESC>j
 
-" Quick format whole buffer
-noremap <leader>f :Format<CR>
+" Quick netrw window
+noremap <silent> <leader>z :Lex<CR>
 
 " Magic search
 noremap / /\v
 
 " Clear highlights TODO: Change to something with leader
-noremap <localleader><CR> :nohls<CR>
+noremap <silent> <localleader><CR> :nohls<CR>
 
 " FZF
 noremap <C-p> :Files<CR>
@@ -226,10 +226,16 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 """""""""""" GLOBALS """""""""
 """"""""""""""""""""""""""""""
 
+" NETRW
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_winsize = 30
+
 " FZF [Buffers] Jump to the existing window if possible
 let g:fzf_buffers_jump = 1
 
 " Goyo
 let g:goyo_width = 120
 let g:goyo_height = 100
+
 ```
