@@ -12,7 +12,10 @@
       }
     }
   },
-  "prettier.printWidth": 120,
-  "prettier.trailingComma": "es5",
-  "prettier.eslintIntegration": true
+  "coc.preferences.extensionUpdateCheck":"never",
+  "suggest.minTriggerInputLength": 2,
+  "signature.floatMaxWidth":  80,
+  "signature.maxWindowHeight": 12,
+  "prettier.disableSuccessMessage": true,
+  "prettier.statusItemText": ""
 }
