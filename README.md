@@ -1,6 +1,20 @@
 ```vim
 " PLUGINS ---------- {{{ 
 
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+" NEOVIM
+" curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+"     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+" VIM
+" curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+"     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
 call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -10,7 +24,7 @@ Plug 'tpope/vim-commentary'
 Plug 'sheerun/vim-polyglot'
 Plug 'junegunn/goyo.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'neovimhaskell/haskell-vim'
+Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
 Plug 'tpope/vim-repeat'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'jiangmiao/auto-pairs'
@@ -18,7 +32,7 @@ Plug 'vim-airline/vim-airline'
 "Plug 'vim-airline/vim-airline-themes'
 Plug 'airblade/vim-gitgutter'
 " Tired of netrw bugs
-Plug 'preservim/nerdtree' 
+Plug 'preservim/nerdtree'
 call plug#end()
 
 " }}} 
@@ -42,8 +56,8 @@ function! MyHighlights() abort
 endfunction
 
 augroup MyColors
-    autocmd!
-    autocmd ColorScheme * call MyHighlights()
+  autocmd!
+  autocmd ColorScheme * call MyHighlights()
 augroup END
 
 colorscheme dracula
@@ -67,7 +81,7 @@ set clipboard=unnamed
 set spelllang=en
 " set spell " To check spellings
 set inccommand=split " Show substitution while on it"
-set list listchars=trail:·
+set listchars=trail:· list
 
 " Yanked text highlight
 " augroup LuaHighlight
@@ -75,9 +89,10 @@ set list listchars=trail:·
 "   autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank()
 " augroup END
 
-augroup filetypeVim
+augroup filetypes
   autocmd!
   autocmd FileType vim setlocal foldmethod=marker
+  " autocmd BufNewFile,BufRead crmui/src/*.js set filetype=javascriptreact
 augroup END
 
 "  }}}
@@ -96,13 +111,17 @@ nnoremap ; :
 vnoremap ; :
 
 " Quick config change and reloads
-noremap <leader>e :vsp ~/.config/nvim/init.vim<CR>
+noremap <silent> <leader>e :vsp ~/.config/nvim/init.vim<CR>
 noremap <leader>r :source ~/.config/nvim/init.vim<CR>
 
 "k Quick save and quit
-noremap <leader>w :w<CR>
-noremap <leader>q :q<CR>
-noremap <leader>Q :q!<CR>
+noremap <silent> <leader>w :w<CR>
+noremap <silent> <leader>q :q<CR>
+noremap <silent> <leader>Q :q!<CR>
+
+" Quick next prev buffer
+noremap <silent> <leader>b :bn<CR>
+noremap <silent> <leader>B :bp<CR>
 
 " Quick split window jumps
 noremap <C-h> <C-w>h
@@ -111,7 +130,7 @@ noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
 
 " Quick close buffer
-noremap <leader>d :bd<CR>
+noremap <silent> <leader>d :bd<CR>
 
 " Quick blank lines
 noremap <leader>j o<ESC>k
@@ -134,6 +153,7 @@ noremap <silent> <localleader><CR> :nohls<CR>
 noremap <C-p> :Files<CR>
 noremap <C-b> :Buffers<CR>
 noremap <C-s> :Rg 
+nnoremap gs :GitFiles?<CR>
 
 " GOYO
 noremap <silent> <leader><CR> :Goyo<CR>
@@ -143,6 +163,7 @@ noremap <silent> <leader><CR> :Goyo<CR>
 
 " COC
 inoremap <silent><expr> <C-space> coc#refresh()
+nnoremap <C-a> <Plug>(coc-codeaction)
 
 " Use tab for trigger completion with characters ahead and navigate.
 inoremap <silent><expr> <TAB>
@@ -171,7 +192,7 @@ nmap <silent> <leader>f  <Plug>(coc-format-selected)
 augroup COCGroup
   autocmd!
   " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  autocmd FileType typescript,javascript,json setl formatexpr=CocAction('formatSelected')
   " Update signature help on jump placeholder.
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
   " Highlight the symbol and its references when holding the cursor.
@@ -220,8 +241,15 @@ let g:fzf_preview_window = ''
 let g:goyo_width = 120
 let g:goyo_height = 100
 
+
 " COC
 let g:coc_node_path = "/Users/pritesh/.nvm/versions/node/v14.5.0/bin/node"
+let g:coc_global_extensions = [
+  \ 'coc-tsserver',
+  \ 'coc-json',
+  \ 'coc-prettier',
+  \ 'coc-eslint',
+  \ ]
 
 " Airline
 let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
@@ -231,7 +259,7 @@ let g:airline_section_z = '%l'
 
 " }}}
 
- " NEOVIM DEFAULTS ------------ {{{
+" NEOVIM DEFAULTS ------------ {{{
 
 " Syntax highlighting is enabled by default
 " ":filetype plugin indent on" is enabled by default
@@ -275,4 +303,22 @@ let g:airline_section_z = '%l'
 " The |man.vim| plugin is enabled, to provide the |:Man| command.
 
 "  }}}
+
+" NODE_OUTPUT --------- {{{
+function! ShowNodeResult()
+  let op = system("node " . bufname("%"))
+  let win = bufwinnr("__NODE_OUTPUT__")
+  if win == -1
+    vsplit __NODE_OUTPUT__
+  else
+    exe win . "wincmd w"
+  endif
+  normal! ggdG
+  setlocal filetype=potionbytecode
+  setlocal buftype=nofile
+  call append(0, split(op, '\v\n'))
+endfunction
+
+command! -nargs=0 Node :call ShowNodeResult()
+" }}}
 ```
