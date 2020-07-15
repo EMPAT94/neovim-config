@@ -23,17 +23,15 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'sheerun/vim-polyglot'
 Plug 'junegunn/goyo.vim'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
 Plug 'tpope/vim-repeat'
-Plug 'terryma/vim-multiple-cursors'
-Plug 'jiangmiao/auto-pairs'
 Plug 'vim-airline/vim-airline'
-"Plug 'vim-airline/vim-airline-themes'
-Plug 'airblade/vim-gitgutter'
-" Tired of netrw bugs
 Plug 'preservim/nerdtree'
+Plug 'tpope/vim-fugitive'
+Plug 'mattn/emmet-vim', { 'for': 'html' }
 call plug#end()
+
 
 " }}} 
 
@@ -81,7 +79,7 @@ set clipboard=unnamed
 set spelllang=en
 " set spell " To check spellings
 set inccommand=split " Show substitution while on it"
-set listchars=trail:· list
+" set listchars=trail:· list
 
 " Yanked text highlight
 " augroup LuaHighlight
@@ -93,6 +91,8 @@ augroup filetypes
   autocmd!
   autocmd FileType vim setlocal foldmethod=marker
   " autocmd BufNewFile,BufRead crmui/src/*.js set filetype=javascriptreact
+  autocmd FileType css set omnifunc=csscomplete#CompleteCSS
+  autocmd FileType html,xhtml setl omnifunc=htmlcomplete#CompleteTags
 augroup END
 
 "  }}}
@@ -249,6 +249,16 @@ let g:coc_global_extensions = [
   \ 'coc-json',
   \ 'coc-prettier',
   \ 'coc-eslint',
+  \ 'coc-yank',
+  \ 'coc-pairs',
+  \ 'coc-lists',
+  \ 'coc-html',
+  \ 'coc-git',
+  \ 'coc-css',
+  \ 'coc-markdownlint',
+  \ 'coc-explorer',
+  \ 'coc-scssmodules',
+  \ 'coc-vimlsp'
   \ ]
 
 " Airline
@@ -306,19 +316,31 @@ let g:airline_section_z = '%l'
 
 " NODE_OUTPUT --------- {{{
 function! ShowNodeResult()
+  " command to run on current buffer
   let op = system("node " . bufname("%"))
+ 
+  " name of output buffer
   let win = bufwinnr("__NODE_OUTPUT__")
+
+  " Check if existing output buffer exists
   if win == -1
+    " If not exists, create a new one
     vsplit __NODE_OUTPUT__
+    " Do not save to disk
+    setlocal buftype=nofile
   else
+    " If exists, switch to it
     exe win . "wincmd w"
+    " Clear buffer
+    normal! ggdG
   endif
-  normal! ggdG
-  setlocal filetype=potionbytecode
-  setlocal buftype=nofile
+
+  " Append output
   call append(0, split(op, '\v\n'))
+
 endfunction
 
+" Bind to a command 
 command! -nargs=0 Node :call ShowNodeResult()
 " }}}
 ```
