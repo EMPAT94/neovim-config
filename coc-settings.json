@@ -12,10 +12,28 @@
       }
     }
   },
-  "coc.preferences.extensionUpdateCheck":"never",
-  "suggest.minTriggerInputLength": 2,
-  "signature.floatMaxWidth":  80,
+
+  "coc.preferences.extensionUpdateCheck": "weekly",
+  "suggest.minTriggerInputLength": 3,
+  "signature.floatMaxWidth": 80,
   "signature.maxWindowHeight": 12,
+  "diagnostic.virtualText": true,
+  "coc.preferences.bracketEnterImprove": false,
+
   "prettier.disableSuccessMessage": true,
-  "prettier.statusItemText": ""
+  "prettier.statusItemText": "",
+
+  "list.maxHeight": 20,
+  "lists.disabledLists": [
+    "commands",
+    "extensions",
+    "locations",
+    "services",
+    "output",
+    "folders",
+    "sessions",
+    "cmdhistory",
+    "colors"
+  ],
+  "list.source.grep.args": ["-i"]
 }

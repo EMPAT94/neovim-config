@@ -17,8 +17,6 @@ endif
 
 call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'sheerun/vim-polyglot'
@@ -26,6 +24,7 @@ Plug 'junegunn/goyo.vim'
 Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
 Plug 'tpope/vim-repeat'
+Plug 'jiangmiao/auto-pairs'
 Plug 'vim-airline/vim-airline'
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-fugitive'
@@ -48,9 +47,9 @@ call plug#end()
 
 function! MyHighlights() abort
   highlight Normal ctermbg=Black
+  highlight link Function DraculaCyan
   highlight Todo cterm=italic ctermbg=Black ctermfg=125
   highlight jsObjectKey cterm=italic
-  highlight link jsFuncArgs DraculaOrange
 endfunction
 
 augroup MyColors
@@ -75,7 +74,7 @@ set nobackup noswapfile nowritebackup
 set updatetime=300
 set shortmess+=c
 set signcolumn=yes
-set clipboard=unnamed
+set clipboard=unnamedplus
 set spelllang=en
 " set spell " To check spellings
 set inccommand=split " Show substitution while on it"
@@ -94,6 +93,10 @@ augroup filetypes
   autocmd FileType css set omnifunc=csscomplete#CompleteCSS
   autocmd FileType html,xhtml setl omnifunc=htmlcomplete#CompleteTags
 augroup END
+
+
+" Quick note
+command! -nargs=0 Note :vsp ~/notes.txt
 
 "  }}}
 
@@ -114,20 +117,25 @@ vnoremap ; :
 noremap <silent> <leader>e :vsp ~/.config/nvim/init.vim<CR>
 noremap <leader>r :source ~/.config/nvim/init.vim<CR>
 
-"k Quick save and quit
+" Quick save and quit
 noremap <silent> <leader>w :w<CR>
 noremap <silent> <leader>q :q<CR>
 noremap <silent> <leader>Q :q!<CR>
 
 " Quick next prev buffer
-noremap <silent> <leader>b :bn<CR>
-noremap <silent> <leader>B :bp<CR>
+noremap <silent> gb :bn<CR>
+noremap <silent> gB :bp<CR>
 
 " Quick split window jumps
 noremap <C-h> <C-w>h
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
+
+" Quick split
+noremap <silent> <leader>s :split<CR>
+noremap <silent> <leader>v :vsplit<CR>
+noremap <silent> <leader>t :tabnew<CR>
 
 " Quick close buffer
 noremap <silent> <leader>d :bd<CR>
@@ -137,7 +145,7 @@ noremap <leader>j o<ESC>k
 noremap <leader>k O<ESC>j
 
 " Quick start/end of line
-nnoremap B ^
+" nnoremap B ^
 nnoremap E g_
 
 " Quick nerdtree window
@@ -149,11 +157,9 @@ noremap / /\v
 " Clear search highlights TODO: Change to something with leader
 noremap <silent> <localleader><CR> :nohls<CR>
 
-" FZF
-noremap <C-p> :Files<CR>
-noremap <C-b> :Buffers<CR>
-noremap <C-s> :Rg 
-nnoremap gs :GitFiles?<CR>
+" Git Fugitive
+nnoremap <silent> <localleader>s :Gstatus<CR>
+nnoremap <silent> <localleader>d :Gdiffsplit<CR>
 
 " GOYO
 noremap <silent> <leader><CR> :Goyo<CR>
@@ -163,7 +169,9 @@ noremap <silent> <leader><CR> :Goyo<CR>
 
 " COC
 inoremap <silent><expr> <C-space> coc#refresh()
-nnoremap <C-a> <Plug>(coc-codeaction)
+noremap <silent> <C-p> :CocList files<CR>
+noremap <silent> <C-b> :CocList buffers<CR>
+noremap <silent> <C-s> :CocList grep<CR>
 
 " Use tab for trigger completion with characters ahead and navigate.
 inoremap <silent><expr> <TAB>
@@ -186,8 +194,9 @@ nmap <silent> gr <Plug>(coc-references)
 nmap <leader>n <Plug>(coc-rename)
 
 " Formatting selected code.
-xmap <silent> <leader>f  <Plug>(coc-format-selected)
-nmap <silent> <leader>f  <Plug>(coc-format-selected)
+" xmap <silent> <leader>f  <Plug>(coc-format-selected)
+" nmap <silent> <leader>f  <Plug>(coc-format-selected)
+nnoremap <silent> <leader>f :Format<CR>
 
 augroup COCGroup
   autocmd!
@@ -216,9 +225,6 @@ command! -nargs=0 Format :call CocAction('format')
 " Add `:Fold` command to fold current buffer.
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 
-" Add `:OR` command for organize imports of the current buffer.
-" command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 function! s:show_documentation()
@@ -233,7 +239,13 @@ endfunction
 
 " GLOBALS ------------- {{{
 
-"FZF
+" Providers
+let g:python_host_prog = "/usr/bin/python2"
+let g:python3_host_prog = "/usr/bin/python3"
+let g:node_host_prog =  "/Users/pritesh/.nvm/versions/node/v14.5.0/lib/node_modules/neovim/bin/cli.js"
+let g:ruby_host_prog = "/Users/pritesh/gems/bin/neovim-ruby-host"
+
+" FZF
 let g:fzf_buffers_jump = 1
 let g:fzf_preview_window = ''
 
@@ -244,27 +256,26 @@ let g:goyo_height = 100
 
 " COC
 let g:coc_node_path = "/Users/pritesh/.nvm/versions/node/v14.5.0/bin/node"
+
 let g:coc_global_extensions = [
   \ 'coc-tsserver',
   \ 'coc-json',
   \ 'coc-prettier',
   \ 'coc-eslint',
   \ 'coc-yank',
-  \ 'coc-pairs',
   \ 'coc-lists',
   \ 'coc-html',
-  \ 'coc-git',
   \ 'coc-css',
   \ 'coc-markdownlint',
-  \ 'coc-explorer',
   \ 'coc-scssmodules',
   \ 'coc-vimlsp'
   \ ]
-
+  "\ 'coc-snippets',
+  
 " Airline
 let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
 let g:airline#extensions#tabline#enabled = 1
-let g:airline_powerline_fonts = 1
+let g:airline_powerline_fonts = 0
 let g:airline_section_z = '%l'
 
 " }}}
@@ -316,28 +327,18 @@ let g:airline_section_z = '%l'
 
 " NODE_OUTPUT --------- {{{
 function! ShowNodeResult()
-  " command to run on current buffer
-  let op = system("node " . bufname("%"))
- 
-  " name of output buffer
+  let op = system("node", bufnr())
   let win = bufwinnr("__NODE_OUTPUT__")
 
-  " Check if existing output buffer exists
   if win == -1
-    " If not exists, create a new one
     vsplit __NODE_OUTPUT__
-    " Do not save to disk
     setlocal buftype=nofile
   else
-    " If exists, switch to it
     exe win . "wincmd w"
-    " Clear buffer
     normal! ggdG
   endif
 
-  " Append output
   call append(0, split(op, '\v\n'))
-
 endfunction
 
 " Bind to a command 
