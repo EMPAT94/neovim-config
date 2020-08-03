@@ -19,6 +19,7 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'sheerun/vim-polyglot'
+Plug 'gitgutter/vim'
 Plug 'junegunn/goyo.vim'
 Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
@@ -45,10 +46,16 @@ call plug#end()
 " nnoremap <leader><leader> :call <SID>SynStack()<CR>
 
 function! MyHighlights() abort
+  highlight DraculaDiffDelete ctermfg=088 ctermbg=Black guifg=#870000 guibg=#000
+  highlight DiffAdd ctermbg=236
   highlight Normal ctermbg=Black
   highlight link Function DraculaCyan
   highlight Todo cterm=italic ctermbg=Black ctermfg=125
   highlight jsObjectKey cterm=italic
+  highlight Search ctermbg=248 guibg=#a8a8a8
+  highlight GitGutterAdd guifg=#009900 ctermfg=2
+  highlight link GitGutterChange DraculaDiffChange
+  highlight GitGutterDelete guifg=#ff2222 ctermfg=1
 endfunction
 
 augroup MyColors
@@ -252,6 +259,14 @@ let g:fzf_preview_window = ''
 let g:goyo_width = 120
 let g:goyo_height = 100
 
+" Gitgutter
+let g:gitgutter_map_keys = 0
+let g:gitgutter_sign_column_always = 1
+let g:gitgutter_sign_added = '│'
+let g:gitgutter_sign_modified = '│'
+let g:gitgutter_sign_removed = '__'
+let g:gitgutter_escape_grep = 1
+let g:gitgutter_max_signs = 1500
 
 " COC
 let g:coc_node_path = "/Users/pritesh/.nvm/versions/node/v14.5.0/bin/node"
