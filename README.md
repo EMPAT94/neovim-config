@@ -3,7 +3,7 @@
 
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
   silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
@@ -20,18 +20,20 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'sheerun/vim-polyglot'
-Plug 'gitgutter/vim'
-Plug 'junegunn/goyo.vim'
-Plug 'neoclide/coc.nvim', { 'branch': 'release' }
-Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
 Plug 'tpope/vim-repeat'
 Plug 'jiangmiao/auto-pairs'
 Plug 'vim-airline/vim-airline'
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-fugitive'
 Plug 'mattn/emmet-vim', { 'for': 'html' }
+Plug 'junegunn/goyo.vim'
+Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
+Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+Plug 'gitgutter/vim'
+Plug 'ap/vim-css-color'
 call plug#end()
 
+" TODO gitgutter causes E5677 error, solve
 
 " }}} 
 
@@ -48,14 +50,19 @@ call plug#end()
 
 function! MyHighlights() abort
   highlight DraculaDiffDelete ctermfg=088 ctermbg=Black guifg=#870000 guibg=#000
-  highlight DiffAdd ctermbg=236
+
   highlight Normal ctermbg=Black
   highlight link Function DraculaCyan
   highlight Todo cterm=italic ctermbg=Black ctermfg=125
   highlight jsObjectKey cterm=italic
   highlight Search ctermbg=248 guibg=#a8a8a8
+
+  highlight DiffAdd ctermbg=236
+  highlight DiffChange ctermbg=236
+  highlight DiffText ctermbg=236 ctermfg=215
+
   highlight GitGutterAdd guifg=#009900 ctermfg=2
-  highlight link GitGutterChange DraculaDiffChange
+  highlight link GitGutterChange DraculaOrange
   highlight GitGutterDelete guifg=#ff2222 ctermfg=1
 endfunction
 
@@ -72,10 +79,10 @@ colorscheme dracula
 
 set mouse=a
 set splitright splitbelow
-set relativenumber
+set number relativenumber
 set ignorecase smartcase
 set expandtab tabstop=2 shiftwidth=2
-set smartindent
+set smartindent autoindent
 set hidden
 set nobackup noswapfile nowritebackup
 set updatetime=300
@@ -83,9 +90,14 @@ set shortmess+=c
 set signcolumn=yes
 set clipboard=unnamedplus
 set spelllang=en
-" set spell " To check spellings
-set inccommand=split " Show substitution while on it"
-" set listchars=trail:· list
+set inccommand=split " Show substitution while on it
+set scrolloff=5 sidescrolloff=5
+set cmdheight=2
+set lazyredraw
+set numberwidth=5
+set list listchars=tab:\ \ ,trail:·,extends:»,precedes:«
+set shada+=<100 " TODO Check more options for faster startup
+set nomodeline
 
 " Yanked text highlight
 " augroup LuaHighlight
@@ -96,7 +108,6 @@ set inccommand=split " Show substitution while on it"
 augroup filetypes
   autocmd!
   autocmd FileType vim setlocal foldmethod=marker
-  " autocmd BufNewFile,BufRead crmui/src/*.js set filetype=javascriptreact
   autocmd FileType css set omnifunc=csscomplete#CompleteCSS
   autocmd FileType html,xhtml setl omnifunc=htmlcomplete#CompleteTags
 augroup END
@@ -151,10 +162,6 @@ noremap <silent> <leader>d :bd<CR>
 noremap <leader>j o<ESC>k
 noremap <leader>k O<ESC>j
 
-" Quick start/end of line
-" nnoremap B ^
-nnoremap E g_
-
 " Quick nerdtree window
 noremap <silent> <leader>z :NERDTreeToggle<CR>
 
@@ -165,6 +172,8 @@ noremap / /\v
 noremap <silent> <localleader><CR> :nohls<CR>
 
 " Git Fugitive
+nnoremap <silent> <localleader>r :Gread<CR>
+nnoremap <silent> <localleader>w :Gwrite<CR>
 nnoremap <silent> <localleader>s :Gstatus<CR>
 nnoremap <silent> <localleader>d :Gdiffsplit<CR>
 
@@ -177,7 +186,6 @@ noremap <silent> <leader><CR> :Goyo<CR>
 " COC
 inoremap <silent><expr> <C-space> coc#refresh()
 noremap <silent> <C-p> :CocList files<CR>
-noremap <silent> <C-b> :CocList buffers<CR>
 noremap <silent> <C-s> :CocList grep<CR>
 
 " Use tab for trigger completion with characters ahead and navigate.
@@ -212,7 +220,7 @@ augroup COCGroup
   " Update signature help on jump placeholder.
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
   " Highlight the symbol and its references when holding the cursor.
-  autocmd CursorHold * silent call CocActionAsync('highlight')
+  " autocmd CursorHold * silent call CocActionAsync('highlight')
 augroup end
 
 " Introduce function and class text object
@@ -249,12 +257,9 @@ endfunction
 " Providers
 let g:python_host_prog = "/usr/bin/python2"
 let g:python3_host_prog = "/usr/bin/python3"
-let g:node_host_prog =  "/Users/pritesh/.nvm/versions/node/v14.5.0/lib/node_modules/neovim/bin/cli.js"
+" let g:node_host_prog =  "/usr/local/bin/neovim-node-host" " TODO add node
+" host prog"
 let g:ruby_host_prog = "/Users/pritesh/gems/bin/neovim-ruby-host"
-
-" FZF
-let g:fzf_buffers_jump = 1
-let g:fzf_preview_window = ''
 
 " Goyo
 let g:goyo_width = 120
@@ -263,9 +268,9 @@ let g:goyo_height = 100
 " Gitgutter
 let g:gitgutter_map_keys = 0
 let g:gitgutter_sign_column_always = 1
-let g:gitgutter_sign_added = '│'
-let g:gitgutter_sign_modified = '│'
-let g:gitgutter_sign_removed = '__'
+let g:gitgutter_sign_added = '▐'
+let g:gitgutter_sign_modified = '▐'
+let g:gitgutter_sign_removed = '▂'
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_max_signs = 1500
 
@@ -290,8 +295,9 @@ let g:coc_global_extensions = [
 " Airline
 let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
 let g:airline#extensions#tabline#enabled = 1
-let g:airline_powerline_fonts = 0
-let g:airline_section_z = '%l'
+let g:airline_powerline_fonts = 1
+let g:airline_section_z = ''
+let g:airline_skip_empty_sections = 1
 
 " }}}
 
@@ -341,6 +347,7 @@ let g:airline_section_z = '%l'
 "  }}}
 
 " NODE_OUTPUT --------- {{{
+
 function! ShowNodeResult()
   let op = system("node", bufnr())
   let win = bufwinnr("__NODE_OUTPUT__")
@@ -356,7 +363,17 @@ function! ShowNodeResult()
   call append(0, split(op, '\v\n'))
 endfunction
 
-" Bind to a command 
+" TODO
+" augroup nodeOP
+"   autocmd!
+"   autocmd BufLeave __NODE_OUTPUT__ execute('bd! win')
+" augroup end
+
 command! -nargs=0 Node :call ShowNodeResult()
+
+" }}}
+
+" PATH --------------- {{{ 
+let $PATH="/Users/pritesh/.nvm/versions/node/v14.5.0/bin:" . $PATH
 " }}}
 ```
