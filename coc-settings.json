@@ -23,6 +23,10 @@
   "prettier.disableSuccessMessage": true,
   "prettier.statusItemText": "",
 
+  "markdownlint.config": {
+    "line_length": false
+  },
+
   "list.maxHeight": 20,
   "lists.disabledLists": [
     "commands",

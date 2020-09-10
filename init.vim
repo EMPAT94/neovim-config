@@ -30,11 +30,12 @@ Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
 Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'gitgutter/vim'
 Plug 'ap/vim-css-color'
+Plug 'dhruvasagar/vim-table-mode'
 call plug#end()
 
 " TODO gitgutter causes E5677 error, solve
 
-" }}} 
+" }}}
 
 " COLORS ------------- {{{
 
@@ -63,6 +64,9 @@ function! MyHighlights() abort
   highlight GitGutterAdd guifg=#009900 ctermfg=2
   highlight link GitGutterChange DraculaOrange
   highlight GitGutterDelete guifg=#ff2222 ctermfg=1
+
+  highlight Trail ctermfg=DarkRed
+  match Trail /\s\+$/
 endfunction
 
 augroup MyColors
@@ -74,7 +78,7 @@ colorscheme dracula
 
 "  }}}
 
-" CUSTOM DEFAULTS ------------- {{{ 
+" CUSTOM DEFAULTS ------------- {{{
 
 set mouse=a
 set splitright splitbelow
@@ -84,7 +88,7 @@ set expandtab tabstop=2 shiftwidth=2
 set smartindent autoindent
 set hidden
 set nobackup noswapfile nowritebackup
-set updatetime=300
+set updatetime=100
 set shortmess+=c
 set signcolumn=yes
 set clipboard=unnamedplus
@@ -97,6 +101,7 @@ set numberwidth=5
 set list listchars=tab:\ \ ,trail:·,extends:»,precedes:«
 set shada+=<100 " TODO Check more options for faster startup
 set nomodeline
+set conceallevel=2
 
 " Yanked text highlight
 " augroup LuaHighlight
@@ -140,8 +145,8 @@ noremap <silent> <leader>q :q<CR>
 noremap <silent> <leader>Q :q!<CR>
 
 " Quick next prev buffer
-noremap <silent> gb :bn<CR>
-noremap <silent> gB :bp<CR>
+noremap <silent> gb :bnext<CR>
+noremap <silent> gB :bprevious<CR>
 
 " Quick split window jumps
 noremap <C-h> <C-w>h
@@ -150,12 +155,12 @@ noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
 
 " Quick split
-noremap <silent> <leader>s :split<CR>
 noremap <silent> <leader>v :vsplit<CR>
 noremap <silent> <leader>t :tabnew<CR>
 
 " Quick close buffer
-noremap <silent> <leader>d :bd<CR>
+noremap <silent> <leader>d :bdelete<CR>
+noremap <silent> <leader>c :close<CR>
 
 " Quick blank lines
 noremap <leader>j o<ESC>k
@@ -171,10 +176,7 @@ noremap / /\v
 noremap <silent> <localleader><CR> :nohls<CR>
 
 " Git Fugitive
-nnoremap <silent> <localleader>r :Gread<CR>
-nnoremap <silent> <localleader>w :Gwrite<CR>
 nnoremap <silent> <localleader>s :Gstatus<CR>
-nnoremap <silent> <localleader>d :Gdiffsplit<CR>
 
 " GOYO
 noremap <silent> <leader><CR> :Goyo<CR>
@@ -218,8 +220,6 @@ augroup COCGroup
   autocmd FileType typescript,javascript,json setl formatexpr=CocAction('formatSelected')
   " Update signature help on jump placeholder.
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-  " Highlight the symbol and its references when holding the cursor.
-  " autocmd CursorHold * silent call CocActionAsync('highlight')
 augroup end
 
 " Introduce function and class text object
@@ -253,11 +253,12 @@ endfunction
 
 " GLOBALS ------------- {{{
 
+let $PATH="/Users/pritesh/.nvm/versions/node/v14.5.0/bin:" . $PATH
+
 " Providers
 let g:python_host_prog = "/usr/bin/python2"
 let g:python3_host_prog = "/usr/bin/python3"
-" let g:node_host_prog =  "/usr/local/bin/neovim-node-host" " TODO add node
-" host prog"
+let g:node_host_prog = "/Users/pritesh/.npm-global/lib/node_modules/neovim/bin/cli.js"
 let g:ruby_host_prog = "/Users/pritesh/gems/bin/neovim-ruby-host"
 
 " Goyo
@@ -265,6 +266,7 @@ let g:goyo_width = 120
 let g:goyo_height = 100
 
 " Gitgutter
+" let g:gitgutter_enabled = 0
 let g:gitgutter_map_keys = 0
 let g:gitgutter_sign_column_always = 1
 let g:gitgutter_sign_added = '▐'
@@ -272,6 +274,7 @@ let g:gitgutter_sign_modified = '▐'
 let g:gitgutter_sign_removed = '▂'
 let g:gitgutter_escape_grep = 1
 let g:gitgutter_max_signs = 1500
+let g:gitgutter_preview_win_floating = 1
 
 " COC
 let g:coc_node_path = "/Users/pritesh/.nvm/versions/node/v14.5.0/bin/node"
@@ -290,7 +293,7 @@ let g:coc_global_extensions = [
   \ 'coc-vimlsp'
   \ ]
   "\ 'coc-snippets',
-  
+
 " Airline
 let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
 let g:airline#extensions#tabline#enabled = 1
@@ -365,13 +368,9 @@ endfunction
 " TODO
 " augroup nodeOP
 "   autocmd!
-"   autocmd BufLeave __NODE_OUTPUT__ execute('bd! win')
+"   autocmd BufLeave __NODE_OUTPUT__ execute('bd! ' . win)
 " augroup end
 
 command! -nargs=0 Node :call ShowNodeResult()
 
-" }}}
-
-" PATH --------------- {{{ 
-let $PATH="/Users/pritesh/.nvm/versions/node/v14.5.0/bin:" . $PATH
 " }}}
