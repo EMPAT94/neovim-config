@@ -31,6 +31,7 @@ Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'gitgutter/vim'
 Plug 'ap/vim-css-color'
 Plug 'dhruvasagar/vim-table-mode'
+Plug 'vimwiki/vimwiki'
 call plug#end()
 
 " TODO gitgutter causes E5677 error, solve
@@ -140,9 +141,9 @@ noremap <silent> <leader>e :vsp ~/.config/nvim/init.vim<CR>
 noremap <leader>r :source ~/.config/nvim/init.vim<CR>
 
 " Quick save and quit
-noremap <silent> <leader>w :w<CR>
-noremap <silent> <leader>q :q<CR>
-noremap <silent> <leader>Q :q!<CR>
+noremap <silent> <leader>s :write<CR>
+noremap <silent> <leader>q :quit<CR>
+noremap <silent> <leader>Q :quit!<CR>
 
 " Quick next prev buffer
 noremap <silent> gb :bnext<CR>
@@ -300,6 +301,11 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_section_z = ''
 let g:airline_skip_empty_sections = 1
+
+" Vimwiki
+let g:vimwiki_list = [{'path': '~/MEGAsync/', 
+      \ 'syntax': 'markdown', 'ext': '.md'}]
+let g:vimwiki_global_ext = 0
 
 " }}}
 
