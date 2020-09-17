@@ -77,6 +77,7 @@ augroup END
 
 colorscheme dracula
 
+
 "  }}}
 
 " CUSTOM DEFAULTS ------------- {{{
@@ -103,6 +104,7 @@ set list listchars=tab:\ \ ,trail:·,extends:»,precedes:«
 set shada+=<100 " TODO Check more options for faster startup
 set nomodeline
 set conceallevel=2
+set nowrap
 
 " Yanked text highlight
 " augroup LuaHighlight
@@ -115,6 +117,8 @@ augroup filetypes
   autocmd FileType vim setlocal foldmethod=marker
   autocmd FileType css set omnifunc=csscomplete#CompleteCSS
   autocmd FileType html,xhtml setl omnifunc=htmlcomplete#CompleteTags
+  autocmd BufEnter *.md setl syntax=markdown
+  autocmd BufEnter /private/tmp/scratch setl buftype=nofile
 augroup END
 
 
@@ -303,7 +307,9 @@ let g:airline_section_z = ''
 let g:airline_skip_empty_sections = 1
 
 " Vimwiki
-let g:vimwiki_list = [{'path': '~/MEGAsync/', 
+let g:vimwiki_list = [{'path': '~/MEGAsync/private', 
+      \ 'syntax': 'markdown', 'ext': '.md'},
+      \ { 'path': '~/MEGAsync',
       \ 'syntax': 'markdown', 'ext': '.md'}]
 let g:vimwiki_global_ext = 0
 
@@ -355,6 +361,12 @@ let g:vimwiki_global_ext = 0
 "  }}}
 
 " NODE_OUTPUT --------- {{{
+
+function! OpenScratch()
+  vsplit /tmp/scratch
+endfunction
+
+command! -nargs=0 Scratch :call OpenScratch()
 
 function! ShowNodeResult()
   let op = system("node", bufnr())
