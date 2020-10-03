@@ -33,6 +33,7 @@ Plug 'gitgutter/vim'
 Plug 'ap/vim-css-color'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'vimwiki/vimwiki'
+Plug 'itchyny/calendar.vim'
 call plug#end()
 
 " TODO gitgutter causes E5677 error, solve
@@ -50,6 +51,7 @@ call plug#end()
 " endfunc
 " nnoremap <leader><leader> :call <SID>SynStack()<CR>
 
+" TODO Add this to "after" folder
 function! MyHighlights() abort
   highlight DraculaDiffDelete ctermfg=088 ctermbg=Black guifg=#870000 guibg=#000
 
@@ -105,13 +107,6 @@ set list listchars=tab:\ \ ,trail:·,extends:»,precedes:«
 set shada+=<100 " TODO Check more options for faster startup
 set nomodeline
 set conceallevel=2
-set nowrap
-
-" Yanked text highlight
-" augroup LuaHighlight
-"   autocmd!
-"   autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank()
-" augroup END
 
 augroup filetypes
   autocmd!
@@ -122,9 +117,8 @@ augroup filetypes
   autocmd BufEnter /private/tmp/scratch setl buftype=nofile
 augroup END
 
-
 " Quick note
-command! -nargs=0 Note :vsp ~/notes.txt
+command! -nargs=0 Temp :vsp /tmp/scratch
 
 "  }}}
 
@@ -146,7 +140,7 @@ noremap <silent> <leader>e :vsp ~/.config/nvim/init.vim<CR>
 noremap <leader>r :source ~/.config/nvim/init.vim<CR>
 
 " Quick save and quit
-noremap <silent> <leader>s :write<CR>
+noremap <silent> <leader>s :update<CR>
 noremap <silent> <leader>q :quit<CR>
 noremap <silent> <leader>Q :quit!<CR>
 
@@ -191,20 +185,29 @@ noremap <silent> <leader><CR> :Goyo<CR>
 " TODO
 
 " COC
-inoremap <silent><expr> <C-space> coc#refresh()
 noremap <silent> <C-p> :CocList files<CR>
 noremap <silent> <C-s> :CocList grep<CR>
 
 " Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? "\<C-n>" :
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
 function! s:check_back_space() abort
   let col = col('.') - 1
-  return !col
+  return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
+
+" Use <c-space> to trigger completion.
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
 
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
@@ -215,16 +218,17 @@ nmap <silent> gr <Plug>(coc-references)
 " Symbol renaming.
 nmap <leader>n <Plug>(coc-rename)
 
+" Applying codeAction to the selected region.
+xmap <leader>a <Plug>(coc-codeaction-selected)
+nmap <leader>a <Plug>(coc-codeaction-selected)
+
 " Formatting selected code.
-" xmap <silent> <leader>f  <Plug>(coc-format-selected)
-" nmap <silent> <leader>f  <Plug>(coc-format-selected)
-nnoremap <silent> <leader>f :Format<CR>
+xmap <silent> <leader>f  <Plug>(coc-format-selected)
+nmap <silent> <leader>f  <Plug>(coc-format-selected)
 
 augroup COCGroup
   autocmd!
-  " Setup formatexpr specified filetype(s).
   autocmd FileType typescript,javascript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder.
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
@@ -239,11 +243,8 @@ omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 
-" Add `:Format` command to format current buffer.
-command! -nargs=0 Format :call CocAction('format')
-
 " Add `:Fold` command to fold current buffer.
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+command! -nargs=? Fold :call CocAction('fold', <f-args>)
 
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -282,9 +283,6 @@ let g:gitgutter_escape_grep = 1
 let g:gitgutter_max_signs = 1500
 let g:gitgutter_preview_win_floating = 1
 
-" COC
-let g:coc_node_path = "/Users/pritesh/.nvm/versions/node/v14.5.0/bin/node"
-
 let g:coc_global_extensions = [
   \ 'coc-tsserver',
   \ 'coc-json',
@@ -305,14 +303,21 @@ let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline_section_z = ''
+let g:airline_section_c = ' '
 let g:airline_skip_empty_sections = 1
 
 " Vimwiki
-let g:vimwiki_list = [{'path': '~/MEGAsync/private', 
-      \ 'syntax': 'markdown', 'ext': '.md'},
-      \ { 'path': '~/MEGAsync',
-      \ 'syntax': 'markdown', 'ext': '.md'}]
+let g:vimwiki_list = [
+      \ { 'path': '~/MEGAsync/private', 'syntax': 'markdown', 'ext': '.md'},
+      \ { 'path': '~/MEGAsync', 'syntax': 'markdown', 'ext': '.md'}]
 let g:vimwiki_global_ext = 0
+
+" Calendar
+let g:calendar_task = 0
+" TODO Attach to google
+" let g:calendar_google_calendar = 1
+" let g:calendar_google_task = 1
+
 
 " }}}
 
@@ -393,4 +398,6 @@ endfunction
 command! -nargs=0 Node :call ShowNodeResult()
 
 " }}}
+
+set secure
 ```
