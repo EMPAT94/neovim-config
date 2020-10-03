@@ -136,7 +136,6 @@ vnoremap ; :
 
 " Quick config change and reloads
 noremap <silent> <leader>e :vsp ~/.config/nvim/init.vim<CR>
-noremap <leader>r :source ~/.config/nvim/init.vim<CR>
 
 " Quick save and quit
 noremap <silent> <leader>s :update<CR>
@@ -158,7 +157,7 @@ noremap <silent> <leader>v :vsplit<CR>
 noremap <silent> <leader>t :tabnew<CR>
 
 " Quick close buffer
-noremap <silent> <leader>d :bdelete<CR>
+noremap <silent> <leader>d :bwipe<CR>
 noremap <silent> <leader>c :close<CR>
 
 " Quick blank lines
@@ -170,6 +169,10 @@ noremap <silent> <leader>z :NERDTreeToggle<CR>
 
 " Magic search
 noremap / /\v
+
+" Quick Search and replace
+xnoremap <leader>r :s/
+nnoremap <leader>r :%s/
 
 " Clear search highlights TODO: Change to something with leader
 noremap <silent> <localleader><CR> :nohls<CR>
