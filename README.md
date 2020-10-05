@@ -25,7 +25,6 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'vim-airline/vim-airline'
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-fugitive'
-Plug 'mattn/emmet-vim', { 'for': 'html' }
 Plug 'junegunn/goyo.vim'
 Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
 Plug 'neoclide/coc.nvim', { 'branch': 'release' }
@@ -79,7 +78,6 @@ augroup MyColors
 augroup END
 
 colorscheme dracula
-
 
 "  }}}
 
@@ -370,12 +368,6 @@ let g:calendar_task = 0
 "  }}}
 
 " NODE_OUTPUT --------- {{{
-
-function! OpenScratch()
-  vsplit /tmp/scratch
-endfunction
-
-command! -nargs=0 Scratch :call OpenScratch()
 
 function! ShowNodeResult()
   let op = system("node", bufnr())
