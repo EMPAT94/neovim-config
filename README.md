@@ -103,7 +103,6 @@ set list listchars=tab:\ \ ,trail:·,extends:»,precedes:«
 set shada+=<100 " TODO Check more options for faster startup
 set nomodeline
 set conceallevel=2
-" set nowrapscan " Search hit bottom
 
 augroup filetypes
   autocmd!
@@ -375,6 +374,7 @@ function! ShowNodeResult()
   if win == -1
     vsplit __NODE_OUTPUT__
     setlocal buftype=nofile
+    setlocal nobackup noswapfile nowritebackup
   else
     exe win . "wincmd w"
     normal! ggdG
@@ -383,11 +383,10 @@ function! ShowNodeResult()
   call append(0, split(op, '\v\n'))
 endfunction
 
-" TODO
-" augroup nodeOP
-"   autocmd!
-"   autocmd BufLeave __NODE_OUTPUT__ execute('bd! ' . win)
-" augroup end
+augroup nodeOP
+  autocmd!
+  autocmd BufLeave __NODE_OUTPUT__ bwipe
+augroup end
 
 command! -nargs=0 Node :call ShowNodeResult()
 
