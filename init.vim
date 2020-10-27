@@ -27,14 +27,12 @@ Plug 'tpope/vim-fugitive'
 Plug 'junegunn/goyo.vim'
 Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
 Plug 'neoclide/coc.nvim', { 'branch': 'release' }
-Plug 'gitgutter/vim'
+Plug 'airblade/vim-gitgutter'
 Plug 'ap/vim-css-color'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'vimwiki/vimwiki'
 Plug 'itchyny/calendar.vim'
 call plug#end()
-
-" TODO gitgutter causes E5677 error, solve
 
 " }}}
 
@@ -104,6 +102,7 @@ set list listchars=tab:\ \ ,trail:·,extends:»,precedes:«
 set shada+=<100 " TODO Check more options for faster startup
 set nomodeline
 set conceallevel=2
+" set nowrapscan " Search hit bottom
 
 augroup filetypes
   autocmd!
