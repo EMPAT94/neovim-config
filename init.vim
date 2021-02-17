@@ -1,51 +1,38 @@
-" PLUGINS ---------- {{{ 
-
-if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
-  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
-        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+let plug_dir=expand('~/.config/nvim/autoload/plug.vim')
+if !filereadable(plug_dir)
+  echo "Installing Vim-Plug..."
+  echo ""
+  exec "!" expand('curl') " -fLo " . shellescape(plug_dir) . " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
 endif
 
-" NEOVIM
-" curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs \
-"     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+let eviline=expand('~/.config/nvim/eviline.lua')
+if !filereadable(eviline)
+  echo "Downloading eviline.lua..."
+  exec "!" expand('curl') . " -fLo " . shellescape(eviline) . " https://raw.githubusercontent.com/glepnir/galaxyline.nvim/main/example/eviline.lua"
+endif
 
-" VIM
-" curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-"     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+call plug#begin('~/.config/nvim/plugged')
+Plug 'neovim/nvim-lspconfig'
+Plug 'nvim-lua/completion-nvim'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'glepnir/galaxyline.nvim', { 'branch': 'main' }
+Plug 'kyazdani42/nvim-web-devicons'
 
-call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
-Plug 'sheerun/vim-polyglot'
-Plug 'tpope/vim-repeat'
 Plug 'jiangmiao/auto-pairs'
-Plug 'vim-airline/vim-airline'
-Plug 'preservim/nerdtree'
-Plug 'tpope/vim-fugitive'
-Plug 'junegunn/goyo.vim'
-Plug 'neovimhaskell/haskell-vim', { 'for': 'haskell' }
-Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'airblade/vim-gitgutter'
 Plug 'ap/vim-css-color'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'vimwiki/vimwiki'
-Plug 'itchyny/calendar.vim'
 call plug#end()
 
-" }}}
 
-" COLORS ------------- {{{
-
-" Get highlight group of word under cursor
-" function! <SID>SynStack()
-"   if !exists("*synstack")
-"     return
-"   endif
-"   echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-" endfunc
-" nnoremap <leader><leader> :call <SID>SynStack()<CR>
+luafile ~/.config/nvim/eviline.lua
 
 " TODO Add this to "after" folder
 function! MyHighlights() abort
@@ -76,9 +63,9 @@ augroup END
 
 colorscheme dracula
 
-"  }}}
-
-" CUSTOM DEFAULTS ------------- {{{
+if has('termguicolors')
+  set termguicolors
+endif
 
 set mouse=a
 set splitright splitbelow
@@ -89,7 +76,6 @@ set smartindent autoindent
 set hidden
 set nobackup noswapfile nowritebackup
 set updatetime=100
-set shortmess+=c
 set signcolumn=yes
 set clipboard=unnamedplus
 set spelllang=en
@@ -99,23 +85,11 @@ set cmdheight=2
 set lazyredraw
 set numberwidth=5
 set list listchars=tab:\ \ ,trail:·,extends:»,precedes:«
-set shada+=<100 " TODO Check more options for faster startup
-set nomodeline
-set conceallevel=2
 
-augroup filetypes
-  autocmd!
-  autocmd FileType vim setlocal foldmethod=marker
-  autocmd FileType css set omnifunc=csscomplete#CompleteCSS
-  autocmd FileType html,xhtml setl omnifunc=htmlcomplete#CompleteTags
-  autocmd BufEnter *.md setl syntax=markdown
-  autocmd BufEnter /private/tmp/scratch setl buftype=nofile
-augroup END
-
-" Quick note
-command! -nargs=0 Temp :vsp /tmp/scratch
-
-"  }}}
+" augroup highlight_yank
+"   autocmd!
+"   autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank()
+" augroup END
 
 " MAPPINGS ------------- {{{
 
@@ -160,9 +134,6 @@ noremap <silent> <leader>c :close<CR>
 noremap <leader>j o<ESC>k
 noremap <leader>k O<ESC>j
 
-" Quick nerdtree window
-noremap <silent> <leader>z :NERDTreeToggle<CR>
-
 " Magic search
 noremap / /\v
 
@@ -170,225 +141,97 @@ noremap / /\v
 xnoremap <leader>r :s/
 nnoremap <leader>r :%s/
 
-" Clear search highlights TODO: Change to something with leader
-noremap <silent> <localleader><CR> :nohls<CR>
+" Clear search highlights
+noremap <silent> <leader><CR> :nohls<CR>
 
-" Git Fugitive
-nnoremap <silent> <localleader>s :Gstatus<CR>
+" Find files using Telescope command-line sugar.
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 
-" GOYO
-noremap <silent> <leader><CR> :Goyo<CR>
+"  }}}
 
-" Commentary
-" TODO
-
-" COC
-noremap <silent> <C-p> :CocList files<CR>
-noremap <silent> <C-s> :CocList grep<CR>
-
-" Use tab for trigger completion with characters ahead and navigate.
-" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
-" other plugin before putting this into your config.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" Use <c-space> to trigger completion.
-if has('nvim')
-  inoremap <silent><expr> <c-space> coc#refresh()
-else
-  inoremap <silent><expr> <c-@> coc#refresh()
-endif
-
-" GoTo code navigation.
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Symbol renaming.
-nmap <leader>n <Plug>(coc-rename)
-
-" Applying codeAction to the selected region.
-xmap <leader>a <Plug>(coc-codeaction-selected)
-nmap <leader>a <Plug>(coc-codeaction-selected)
-
-" Formatting selected code.
-xmap <silent> <leader>f  <Plug>(coc-format-selected)
-nmap <silent> <leader>f  <Plug>(coc-format-selected)
-
-augroup COCGroup
-  autocmd!
-  autocmd FileType typescript,javascript,json setl formatexpr=CocAction('formatSelected')
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-" Introduce function and class text object
-" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
-xmap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap if <Plug>(coc-funcobj-i)
-omap af <Plug>(coc-funcobj-a)
-xmap ic <Plug>(coc-classobj-i)
-omap ic <Plug>(coc-classobj-i)
-xmap ac <Plug>(coc-classobj-a)
-omap ac <Plug>(coc-classobj-a)
-
-" Add `:Fold` command to fold current buffer.
-command! -nargs=? Fold :call CocAction('fold', <f-args>)
-
-" Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-
-" }}}
 
 " GLOBALS ------------- {{{
 
 let $PATH="/Users/pritesh/.nvm/versions/node/v14.5.0/bin:" . $PATH
 
-" Providers
-let g:python_host_prog = "/usr/bin/python2"
-let g:python3_host_prog = "/usr/bin/python3"
-let g:node_host_prog = "/Users/pritesh/.npm-global/lib/node_modules/neovim/bin/cli.js"
-let g:ruby_host_prog = "/Users/pritesh/gems/bin/neovim-ruby-host"
-
-" Goyo
-let g:goyo_width = 120
-let g:goyo_height = 100
-
-" Gitgutter
-" let g:gitgutter_enabled = 0
-let g:gitgutter_map_keys = 0
-let g:gitgutter_sign_column_always = 1
-let g:gitgutter_sign_added = '▐'
-let g:gitgutter_sign_modified = '▐'
-let g:gitgutter_sign_removed = '▂'
-let g:gitgutter_escape_grep = 1
-let g:gitgutter_max_signs = 1500
-let g:gitgutter_preview_win_floating = 1
-
-let g:coc_global_extensions = [
-  \ 'coc-tsserver',
-  \ 'coc-json',
-  \ 'coc-prettier',
-  \ 'coc-eslint',
-  \ 'coc-yank',
-  \ 'coc-lists',
-  \ 'coc-html',
-  \ 'coc-css',
-  \ 'coc-markdownlint',
-  \ 'coc-scssmodules',
-  \ 'coc-vimlsp'
-  \ ]
-  "\ 'coc-snippets',
-
-" Airline
-let g:airline#parts#ffenc#skip_expected_string='utf-8[unix]'
-let g:airline#extensions#tabline#enabled = 1
-let g:airline_powerline_fonts = 1
-let g:airline_section_z = ''
-let g:airline_section_c = ' '
-let g:airline_skip_empty_sections = 1
-
-" Vimwiki
 let g:vimwiki_list = [
       \ { 'path': '~/MEGAsync/private', 'syntax': 'markdown', 'ext': '.md'},
       \ { 'path': '~/MEGAsync', 'syntax': 'markdown', 'ext': '.md'}]
 let g:vimwiki_global_ext = 0
 
-" Calendar
-let g:calendar_task = 0
-" TODO Attach to google
-" let g:calendar_google_calendar = 1
-" let g:calendar_google_task = 1
-
-
-" }}}
-
-" NEOVIM DEFAULTS ------------ {{{
-
-" Syntax highlighting is enabled by default
-" ":filetype plugin indent on" is enabled by default
-" 'autoindent' is enabled
-" 'autoread' is enabled
-" 'background' defaults to "dark" (unless set automatically by the terminal/UI)
-" 'backspace' defaults to "indent,eol,start"
-" 'backupdir' defaults to .,~/.local/share/nvim/backup (|xdg|)
-" 'belloff' defaults to "all"
-" 'compatible' is always disabled
-" 'complete' excludes "i"
-" 'cscopeverbose' is enabled
-" 'directory' defaults to ~/.local/share/nvim/swap// (|xdg|), auto-created
-" 'display' defaults to "lastline,msgsep"
-" 'encoding' is UTF-8 (cf. 'fileencoding' for file-content encoding)
-" 'fillchars' defaults (in effect) to "vert:│,fold:·"
-" 'formatoptions' defaults to "tcqj"
-" 'fsync' is disabled
-" 'history' defaults to 10000 (the maximum)
-" 'hlsearch' is enabled
-" 'incsearch' is enabled
-" 'langnoremap' is enabled
-" 'langremap' is disabled
-" 'laststatus' defaults to 2 (statusline is always shown)
-" 'listchars' defaults to "tab:> ,trail:-,nbsp:+"
-" 'nrformats' defaults to "bin,hex"
-" 'ruler' is enabled
-" 'sessionoptions' excludes "options"
-" 'shortmess' includes "F", excludes "S"
-" 'showcmd' is enabled
-" 'sidescroll' defaults to 1
-" 'smarttab' is enabled
-" 'tabpagemax' defaults to 50
-" 'tags' defaults to "./tags;,tags"
-" 'ttimeoutlen' defaults to 50
-" 'ttyfast' is always set
-" 'undodir' defaults to ~/.local/share/nvim/undo (|xdg|), auto-created
-" 'viminfo' includes "!"
-" 'wildmenu' is enabled
-" 'wildoptions' defaults to "pum,tagfile"
-" The |man.vim| plugin is enabled, to provide the |:Man| command.
-
 "  }}}
 
-" NODE_OUTPUT --------- {{{
+:lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = true
+  },
+}
+EOF
+" :TSInstall maintained
 
-function! ShowNodeResult()
-  let op = system("node", bufnr())
-  let win = bufwinnr("__NODE_OUTPUT__")
 
-  if win == -1
-    vsplit __NODE_OUTPUT__
-    setlocal buftype=nofile
-    setlocal nobackup noswapfile nowritebackup
-  else
-    exe win . "wincmd w"
-    normal! ggdG
-  endif
+:lua << EOF
+  local nvim_lsp = require('lspconfig')
 
-  call append(0, split(op, '\v\n'))
-endfunction
+  local on_attach = function(client, bufnr)
+    require('completion').on_attach()
 
-augroup nodeOP
-  autocmd!
-  autocmd BufLeave __NODE_OUTPUT__ bwipe
-augroup end
+    local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+    local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
-command! -nargs=0 Node :call ShowNodeResult()
+    buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-" }}}
+    -- Mappings
+    local opts = { noremap=true, silent=true }
+    buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+    buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+    buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+    buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+    buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+    buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+    buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+    buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+    buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+    buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+    buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+    buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+    buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
-set secure
+    -- Set some keybinds conditional on server capabilities
+    if client.resolved_capabilities.document_formatting then
+        buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+    elseif client.resolved_capabilities.document_range_formatting then
+        buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+    end
+
+    -- Set autocommands conditional on server_capabilities
+    if client.resolved_capabilities.document_highlight then
+        require('lspconfig').util.nvim_multiline_command [[
+        :hi LspReferenceRead cterm=bold ctermbg=red guibg=LightYellow
+        :hi LspReferenceText cterm=bold ctermbg=red guibg=LightYellow
+        :hi LspReferenceWrite cterm=bold ctermbg=red guibg=LightYellow
+        augroup lsp_document_highlight
+            autocmd!
+            autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
+            autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+        augroup END
+        ]]
+    end
+  end
+
+  local servers = {'pyright', 'gopls', 'rust_analyzer'}
+  for _, lsp in ipairs(servers) do
+    nvim_lsp[lsp].setup {
+      on_attach = on_attach,
+    }
+  end
+EOF
+
+" Completion
+let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
