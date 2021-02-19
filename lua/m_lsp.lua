@@ -1,26 +1,10 @@
-
-require('nvim-web-devicons').setup { default = true; }
-
-require('telescope').setup {
-  defaults = {
-    layout_strategy = "vertical",
-    mappings = { i = { ["<esc>"] = require('telescope.actions').close }, },
-  }
-}
-
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = 'maintained',
-  highlight = {
-    enable = true
-  },
-}
-
 local nvim_lsp = require('lspconfig')
+
 local on_attach = function(client, bufnr)
-  require('completion').on_attach()
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
+  require('completion').on_attach()
   buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 
   -- Mappings
@@ -53,7 +37,7 @@ end
 
 -- Use a loop to conveniently both setup defined servers 
 -- and map buffer local keybindings when the language server attaches
-local servers = { "tsserver" }
+local servers = { "tsserver", "jsonls", "cssls", "bashls", "html" }
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup { on_attach = on_attach }
 end
