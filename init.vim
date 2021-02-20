@@ -27,4 +27,6 @@ source $HOME/.config/nvim/plugin_modules/goyo.vim
 
 source $HOME/.config/nvim/plugin_modules/vimwiki.vim
 
+source $HOME/.config/nvim/plugin_modules/fugitive.vim
+
 colorscheme dracula

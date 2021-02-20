@@ -11,22 +11,15 @@ augroup MyColors
 augroup END
 
 function! MyHighlights() abort
-  highlight Normal guibg=Black
-  highlight link Function DraculaCyan
+  highlight Normal guibg=#1c1c1c
 
-  highlight Todo gui=italic guibg=Black guifg=Purple
-  highlight jsObjectKey gui=italic
-  highlight Search guibg=248 guibg=#a8a8a8
-
-  highlight DiffAdd guibg=236
-  highlight DiffChange guibg=236
-  highlight DiffText guibg=236 guifg=215
-  highlight DraculaDiffDelete guifg=#870000 guibg=#000
-
-  highlight GitGutterAdd guifg=#009900 
-  highlight link GitGutterChange DraculaOrange
-  highlight GitGutterDelete guifg=#ff2222 guifg=1
-
+  highlight Todo gui=bold,italic guibg=NONE guifg=Purple
+  highlight Search guibg=#a8a8a8
   highlight Trail guifg=DarkRed
   match Trail /\s\+$/
+
+  highlight DiffAdd guibg=#254035 guifg=NONE gui=NONE
+  highlight DiffDelete guibg=#440000 guifg=NONE gui=NONE
+  highlight DiffChange guibg=#292929 guifg=NONE gui=NONE
+  highlight DiffText guibg=#252525 guifg=orange gui=underline
 endfunction
