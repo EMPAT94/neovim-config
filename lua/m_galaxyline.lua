@@ -4,23 +4,44 @@ local condition = require('galaxyline.condition')
 local gls = gl.section
 gl.short_line_list = {'NvimTree','vista','dbui'}
 
+-- | ViMode | GitIcon | GitBranch | FileName | <---> | Diagnostics |  ViMode | --
 
--- | ViMode | GitIcon | GitBranch | FileName | <---> | Diagnostics | --
+local mode_color = {
+  n = colors.red,
+  i = colors.green,
+  v = colors.blue,
+
+  [''] = colors.blue,
+  V = colors.blue,
+
+  c = colors.magenta,
+  no = colors.red,
+  s = colors.orange,
+
+  S = colors.orange,
+  [''] = colors.orange,
+
+  ic = colors.yellow,
+  R = colors.violet,
+  Rv = colors.violet,
+
+  cv = colors.red,
+  ce = colors.red,
+   r = colors.cyan,
+
+  rm = colors.cyan,
+   ['r?'] = colors.cyan,
+
+  ['!'] = colors.red,
+  t = colors.red
+}
+
 
 gls.left[1] = {
   ViMode = {
     provider = function()
-      -- auto change color according the vim mode
-      local mode_color = {n = colors.red, i = colors.green,v=colors.blue,
-                          [''] = colors.blue,V=colors.blue,
-                          c = colors.magenta,no = colors.red,s = colors.orange,
-                          S=colors.orange,[''] = colors.orange,
-                          ic = colors.yellow,R = colors.violet,Rv = colors.violet,
-                          cv = colors.red,ce=colors.red, r = colors.cyan,
-                          rm = colors.cyan, ['r?'] = colors.cyan,
-                          ['!']  = colors.red,t = colors.red}
       vim.api.nvim_command('hi GalaxyViMode guifg='..mode_color[vim.fn.mode()])
-      return '█████████'
+      return '█'
     end,
     highlight = {colors.red,colors.bg,'bold'},
     separator = ' ',
@@ -86,6 +107,18 @@ gls.right[4] = {
     icon = '  ',
     highlight = {colors.blue,colors.bg},
   }
+}
+
+gls.right[5] = {
+  ViMode = {
+    provider = function()
+      vim.api.nvim_command('hi GalaxyViMode guifg='..mode_color[vim.fn.mode()])
+      return '█'
+    end,
+    highlight = {colors.red,colors.bg,'bold'},
+    separator = ' ',
+    separator_highlight = {'NONE',colors.bg},
+  },
 }
 
 gls.short_line_left[2] = {
