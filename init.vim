@@ -64,25 +64,29 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'airblade/vim-gitgutter'
 
 " A very fast, multi-syntax context-sensitive color name highlighter.
-Plug 'ap/vim-css-color'
+Plug 'ap/vim-css-color', { 'on': [] }
 
 " An awesome automatic table creator & formatter allowing one to create neat tables as you type.
 Plug 'dhruvasagar/vim-table-mode', { 'for': 'markdown' }
 
 " Create a personal wiki using the Vim text editor.
-Plug 'vimwiki/vimwiki'
+Plug 'vimwiki/vimwiki', { 'on': [] }
 
 "  Preview Markdown in real-time with a web browser.
-Plug 'iamcco/markdown-preview.nvim', { 'for': 'markdown', 'do': 'cd app && npm install' }
+Plug 'iamcco/markdown-preview.nvim', { 'on': [] }
 
 " The interactive scratchpad for hackers.
-Plug 'metakirby5/codi.vim'
+Plug 'metakirby5/codi.vim', { 'on': [] }
 
 " Distraction-free writing in Vim.
 Plug 'junegunn/goyo.vim'
 
 call plug#end()
 
+command! LoadCodi execute "call plug#load('codi.vim') | Codi"
+command! LoadWiki execute "call plug#load('vimwiki') | vsplit | VimwikiIndex"
+command! LoadMdPreview execute "call plug#load('markdown-preview') | MardownPreview"
+" command! LoadCssColors execute "call plug#load('vim-css-color')"
 
 "--------------------------------------"
 "---------- GENERAL MAPPINGS ----------"
@@ -148,9 +152,6 @@ noremap <silent> <localleader><CR> :nohls<CR>
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-" Manually trigger completion
-imap <tab> <Plug>(completion_smart_tab)
-imap <s-tab> <Plug>(completion_smart_s_tab)
 
 "------------------------------------"
 "---------- EDITOR OPTIONS ----------"
@@ -278,6 +279,10 @@ let g:loaded_ruby_provider = 0
 "---------- PLUGIN SETTINGS ----------"
 "-------------------------------------"
 
+" Completion
+imap <tab> <Plug>(completion_smart_tab)
+imap <s-tab> <Plug>(completion_smart_s_tab)
+
 " Telescope
 nnoremap <C-p> <cmd>lua require('telescope.builtin').find_files({
       \ previewer = false,
@@ -287,10 +292,6 @@ nnoremap <C-s> <cmd>lua require('telescope.builtin').live_grep({
       \ previewer = false,
       \ prompt_title = "Grep" })<cr>
 
-nnoremap <C-g> <cmd>lua require('telescope.builtin').builtin({
-      \ previewer = false,
-      \ prompt_title = "Git Status" })<cr>
-
 " Goyo
 let g:goyo_width = 120
 let g:goyo_height = 90
@@ -299,7 +300,6 @@ noremap <silent> <leader><CR> :Goyo<CR>
 
 " Vimwiki
 let g:vimwiki_list = [{ 'path': '~/MEGAsync/notes/private', 'syntax': 'markdown', 'ext': '.md' }]
-
 let g:vimwiki_global_ext = 0
 
 " Fugitive
@@ -307,6 +307,10 @@ nnoremap <silent> <localleader>s :G<CR>
 nnoremap <silent> <localleader>d :Gvdiffsplit<CR>
 
 let g:fugitive_no_maps = 1
+
+" Netrw
+let g:netrw_banner = 0 " Hide banner
+let g:list_style = 1 "long listing one file per line with time stamp information and file size
 
 
 "------------------------------"
