@@ -36,9 +36,15 @@ Plug 'nvim-lua/plenary.nvim'
 " A highly extendable fuzzy finder over lists.
 Plug 'nvim-telescope/telescope.nvim'
 
+" Use fzf instead of builtin finder in telescope
+Plug 'nvim-telescope/telescope-fzf-writer.nvim'
+
 " Wraps the Neovim treesitter API to provide functionnalities such as highlighting and incremental selection,
 " and a command to easily install parsers.
 Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+
+" A File Explorer For Neovim Written In Lua
+Plug 'kyazdani42/nvim-tree.lua'
 
 " A light-weight and Super Fast statusline plugin.
 Plug 'glepnir/galaxyline.nvim', { 'branch': 'main' }
@@ -55,6 +61,9 @@ Plug 'tpope/vim-surround'
 " Comment stuff out.
 Plug 'tpope/vim-commentary'
 
+" Provides a single command that deletes the current buffer in a smart way.
+Plug 'mhinz/vim-sayonara', { 'on': 'Sayonara' }
+
 " Fugitive is the premier Vim plugin for Git. Or maybe it's the premier Git plugin for Vim?
 Plug 'tpope/vim-fugitive'
 
@@ -65,25 +74,34 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'airblade/vim-gitgutter'
 
 " A very fast, multi-syntax context-sensitive color name highlighter.
-Plug 'ap/vim-css-color'
+Plug 'ap/vim-css-color', { 'on': [] }
 
 " An awesome automatic table creator & formatter allowing one to create neat tables as you type.
 Plug 'dhruvasagar/vim-table-mode', { 'for': 'markdown' }
 
 " Create a personal wiki using the Vim text editor.
-Plug 'vimwiki/vimwiki'
+Plug 'vimwiki/vimwiki', { 'on': [] }
 
 "  Preview Markdown in real-time with a web browser.
-Plug 'iamcco/markdown-preview.nvim', { 'for': 'markdown', 'do': 'cd app && npm install' }
+Plug 'iamcco/markdown-preview.nvim'
 
 " The interactive scratchpad for hackers.
-Plug 'metakirby5/codi.vim'
+Plug 'metakirby5/codi.vim', { 'on': [] }
 
 " Distraction-free writing in Vim.
 Plug 'junegunn/goyo.vim'
 
+" Wrapper for prettier, pre-configured with custom default prettier settings
+Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+
+" Snippets plugin written in lua
+Plug 'norcalli/snippets.nvim'
+
 call plug#end()
 
+command! LoadCodi execute "call plug#load('codi.vim') | Codi"
+command! LoadWiki execute "call plug#load('vimwiki') | vsplit | VimwikiIndex"
+" command! LoadCssColors execute "call plug#load('vim-css-color')"
 
 "--------------------------------------"
 "---------- GENERAL MAPPINGS ----------"
@@ -95,6 +113,8 @@ let maplocalleader = " "
 " Remap j and k to scroll by visual lines
 nnoremap j gj
 nnoremap k gk
+vnoremap j gj
+vnoremap k gk
 
 " Colon switch
 nnoremap ; :
@@ -104,11 +124,9 @@ vnoremap ; :
 noremap <silent> <leader>e :vsp ~/.config/nvim/init.vim<CR>
 
 " Close, save and quit
-noremap <silent> <leader>d :bwipe<CR>
-noremap <silent> <leader>c :close<CR>
 noremap <silent> <leader>s :update<CR>
-noremap <silent> <leader>q :quit<CR>
-noremap <silent> Q :quit!<CR>
+noremap <silent> <leader>q :Sayonara<CR>
+noremap <silent> Q :Sayonara!<CR>
 
 " Next & prev buffer
 noremap <silent> gb :bnext<CR>
@@ -119,6 +137,10 @@ noremap <C-h> <C-w>h
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
+tnoremap <C-h> <C-\><C-n><C-w>h
+tnoremap <C-j> <C-\><C-n><C-w>j
+tnoremap <C-k> <C-\><C-n><C-w>k
+tnoremap <C-l> <C-\><C-n><C-w>l
 
 " Vertical & horizontal split
 noremap <silent> <leader>v :vsplit<CR>
@@ -146,12 +168,11 @@ nnoremap <leader>r :%s//g<Left><Left>
 noremap <silent> <localleader><CR> :nohls<CR>
 
 " Use tab for completion selection
-inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<C-x><C-o>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
-" Manually trigger completion
-imap <tab> <Plug>(completion_smart_tab)
-imap <s-tab> <Plug>(completion_smart_s_tab)
+" Inbuild terminal ESC normal mode
+tnoremap <Esc> <C-\><C-n>
 
 "------------------------------------"
 "---------- EDITOR OPTIONS ----------"
@@ -232,21 +253,26 @@ set completeopt=menuone,noinsert,noselect
 " Don't give insert mode messages.
 set shortmess+=c
 
+" Don't fold on high-levels on start
+set foldlevel=5
 
 "-------------------------------------------"
 "---------- GENERAL AUTO COMMANDS ----------"
 "-------------------------------------------"
 
-" Blink yanked text
-augroup highlight_yank
+augroup CustomCmds
   autocmd!
+  " Blink yanked text
   autocmd TextYankPost * silent! lua require'vim.highlight'.on_yank()
-augroup END
 
-" Set custom highlights
-augroup MyColors
-  autocmd!
+  " Set custom highlights
   autocmd ColorScheme * call MyHighlights()
+
+  " Auto load vimwiki if opening notes
+  autocmd VimEnter */notes/** call plug#load('vimwiki')
+
+  " start terminal in insert mode
+  autocmd BufEnter * if &buftype == 'terminal' | call TermOptions() | endif
 augroup END
 
 function! MyHighlights() abort
@@ -263,13 +289,22 @@ function! MyHighlights() abort
   highlight DiffText guibg=#252525 guifg=orange gui=underline
 endfunction
 
+function! TermOptions () abort
+  if exists('g:termOptionsSet')
+    return
+  endif
 
+  let g:termOptionsSet = '1'
+  set nonu nornu
+  execute "startinsert"
+endfunction
 "-----------------------------------"
 "---------- GLOBAL VALUES ----------"
 "-----------------------------------"
 
 let $PATH="/Users/pritesh/.nvm/versions/node/v14.5.0/bin:" . $PATH
-let g:python3_host_prog = "/usr/local/bin/python3"
+" let g:python3_host_prog = "/usr/local/bin/python3"
+let g:python3_host_prog = 0
 let g:loaded_python_provider = 0
 let g:loaded_perl_provider = 0
 let g:loaded_ruby_provider = 0
@@ -280,17 +315,18 @@ let g:loaded_ruby_provider = 0
 "-------------------------------------"
 
 " Telescope
-nnoremap <C-p> <cmd>lua require('telescope.builtin').find_files({
+nnoremap <C-t> <cmd>lua require('telescope').extensions.fzf_writer.files({
       \ previewer = false,
       \ prompt_title = "Files" })<cr>
 
-nnoremap <C-s> <cmd>lua require('telescope.builtin').live_grep({
-      \ previewer = false,
-      \ prompt_title = "Grep" })<cr>
+nnoremap gr <cmd>Telescope lsp_references<CR>
 
-nnoremap <C-g> <cmd>lua require('telescope.builtin').builtin({
-      \ previewer = false,
-      \ prompt_title = "Git Status" })<cr>
+nnoremap <c-s> <cmd>lua require('telescope').extensions.fzf_writer.staged_grep({
+      \ prompt_title = "grep" })<cr>
+
+" LSP
+nnoremap <C-f> <cmd>lua vim.lsp.buf.formatting()<CR>
+vnoremap <C-f> <cmd>lua vim.lsp.buf.range_formatting()<CR>
 
 " Goyo
 let g:goyo_width = 120
@@ -300,7 +336,6 @@ noremap <silent> <leader><CR> :Goyo<CR>
 
 " Vimwiki
 let g:vimwiki_list = [{ 'path': '~/MEGAsync/notes/private', 'syntax': 'markdown', 'ext': '.md' }]
-
 let g:vimwiki_global_ext = 0
 
 " Fugitive
@@ -308,6 +343,18 @@ nnoremap <silent> <localleader>s :G<CR>
 nnoremap <silent> <localleader>d :Gvdiffsplit<CR>
 
 let g:fugitive_no_maps = 1
+
+" Treesiter based folding
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+
+" Nvim tree
+let g:nvim_tree_auto_open = 1
+let g:nvim_tree_indent_markers = 1
+let g:nvim_tree_hide_dotfiles = 1
+let g:nvim_tree_ignore = [ '.git', 'node_modules', '.cache' ]
+
+nnoremap <leader>z :NvimTreeToggle<CR>
 
 
 "------------------------------"
